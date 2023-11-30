@@ -1,19 +1,25 @@
 import { Client } from "discord.js";
-import { readdirSync } from "fs";
-import { join } from "path";
+import { promises as fsPromises } from "node:fs";
+import { join } from "node:path";
 import { color } from "../functions";
 import { BotEvent } from "../types";
 
-module.exports = (client: Client) => {
-    let eventsDir = join(__dirname, "../events")
+module.exports = async (client: Client) => {
+    const eventsDirectory = join(__dirname, "../events");
 
-    readdirSync(eventsDir).forEach(file => {
-        if (!file.endsWith(".js")) return;
-        let event: BotEvent = require(`${eventsDir}/${file}`).default
-        event.once ?
-            client.once(event.name, (...args) => event.execute(...args))
-            :
-            client.on(event.name, (...args) => event.execute(...args))
-        console.log(color("text", `🌠 Successfully loaded event ${color("variable", event.name)}`))
-    })
-}
+    const files = await fsPromises.readdir(eventsDirectory);
+    for (const file of files) {
+        if (!file.endsWith(".js")) continue;
+        const eventPath = join(eventsDirectory, file);
+        const eventModule = await import(eventPath);
+        const event: BotEvent = eventModule.default;
+
+        if (event.once) {
+            client.once(event.name, (...arguments_) => event.execute(...arguments_));
+        } else {
+            client.on(event.name, (...arguments_) => event.execute(...arguments_));
+        }
+
+        console.log(color("text", `🌠 Successfully loaded event ${color("variable", event.name)}`));
+    }
+};

@@ -61,9 +61,8 @@ const command: SlashCommand = {
         { name: "LightGrey", value: "LightGrey" },
         { name: "DarkNavy", value: "DarkNavy" }
       ];
-      let filtered: { name: string, value: string }[] = []
-      for (let i = 0; i < choices.length; i++) {
-        const choice = choices[i];
+      const filtered: { name: string, value: string }[] = []
+      for (const choice of choices) {
         if (choice.name.includes(focusedValue)) filtered.push(choice);
       }
       await interaction.respond(
@@ -78,8 +77,8 @@ const command: SlashCommand = {
       await interaction.deferReply({ ephemeral: true });
       const options: { [key: string]: string | number | boolean } = {};
       if (!interaction.options) return interaction.editReply({ content: "Something went wrong..." });
-      for (let i = 0; i < interaction.options.data.length; i++) {
-        const element = interaction.options.data[i];
+      for (let index = 0; index < interaction.options.data.length; index++) {
+        const element = interaction.options.data[index];
         if (element.name && element.value) options[element.name] = element.value;
       }
       const embed = new EmbedBuilder()
@@ -90,10 +89,10 @@ const command: SlashCommand = {
         .setThumbnail(interaction.client.user?.avatarURL() || null)
         .setTimestamp()
         .setFooter({ text: "Test embed message", iconURL: interaction.client.user?.avatarURL() || undefined });
-      let selectedTextChannel = interaction.channel?.client.channels.cache.get(options.channel.toString()) as TextChannel
+      const selectedTextChannel = interaction.channel?.client.channels.cache.get(options.channel.toString()) as TextChannel
       selectedTextChannel.send({ embeds: [embed] });
       return interaction.editReply({ content: "Embed message successfully sent." })
-    } catch (error) {
+    } catch {
       interaction.editReply({ content: "Something went wrong..." });
     }
 
