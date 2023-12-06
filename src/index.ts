@@ -27,8 +27,8 @@ async function loadHandlers() {
 client.on('ready', () => {
     if (client.user) {
         client.user.setActivity({
-            name: `With Your Mom`, 
-            type: ActivityType.Streaming 
+            name: `zu wie deine Mom gerailed wird`, 
+            type: ActivityType.Watching 
         });
     }
 });

@@ -14,7 +14,11 @@ const event: BotEvent = {
                 if (guildPrefix) prefix = guildPrefix;
         }
 
-        if (!message.content.startsWith(prefix)) return;
+        if (prefix) {
+            if (!message.content.startsWith(prefix)) return;
+        } else {
+            return;
+        }
         if (message.channel.type !== ChannelType.GuildText) return;
 
         const arguments_ = message.content.slice(prefix.length).split(" ")
