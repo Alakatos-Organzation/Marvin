@@ -66,7 +66,7 @@ const command: SlashCommand = {
     });
     collector.on("collect", async (reaction, user) => {
       console.log(`Collected ${reaction.emoji.name}`);
-      if (reaction?.emoji.name === "👍" && reaction.count === 2) {
+      if (reaction?.emoji.name === "👍" && reaction.count === 2) { /* Muss für tatsächlichen Use-Case auf 6 gesetzt werden */
         const guild = interaction.guild
         if (!guild)
           return console.log("Guild not found")
@@ -76,7 +76,7 @@ const command: SlashCommand = {
           privacyLevel:GuildScheduledEventPrivacyLevel.GuildOnly,
           entityType: GuildScheduledEventEntityType.Voice,
           description: 'Scrimtermin',
-          channel: '1181997423715950674',
+          channel: '1181997423715950674', /* 1170421452483342417 ist die Kanal-ID für tatsächlichen Use-Case */
           image: null,
           reason: 'Ein neuer Scrimtermin wurde festgelegt'
         })
