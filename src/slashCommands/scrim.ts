@@ -6,13 +6,29 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
+function parseDateTime(dateString: string, timeString: string): Date {
+  const [day, month] = dateString.split('.').map(Number);
+  const [hour, minute] = timeString.split(':').map(Number);
+
+  const year = new Date().getFullYear();
+  const date = new Date(year, month - 1, day, hour, minute);
+
+  return date;
+}
+
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName("scrim")
     .addStringOption((option) => {
       return option
-        .setName("wochentag")
-        .setDescription("Tag für die Scrimgames")
+        .setName("datum")
+        .setDescription("Datum für die Scrimgames in der Form dd.MM")
+        .setRequired(true);
+    })
+    .addStringOption((option) => {
+      return option
+        .setName("uhrzeit")
+        .setDescription("Uhrzeit für die Scrimgames in der Form hh:mm")
         .setRequired(true);
     })
     .addIntegerOption((option) => {
@@ -30,11 +46,13 @@ const command: SlashCommand = {
     })
     .setDescription("Scrimtermin ausmachen"),
   execute: async (interaction) => {
-    const Day = interaction.options.getString("wochentag");
+    const Day = interaction.options.getString("datum");
+    const Time = interaction.options.getString("uhrzeit");
     const Team = interaction.options.getString("team") ?? "so nen random Team";
     const gameCount = Number(interaction.options.get("gamecount")?.value);
+    const startDate = parseDateTime(Day!, Time!)
     interaction.reply({
-      content: `Passt für jeden ${gameCount} scrimgame(s) ${Day} gegen ${Team}`,
+      content: `Passt für jeden ${gameCount} Scrimgame(s) am ${Day} um ${Time} Uhr gegen ${Team}`,
       fetchReply: true,
     });
     const message = await interaction.fetchReply();
@@ -53,14 +71,14 @@ const command: SlashCommand = {
         if (!guild)
           return console.log("Guild not found")
         guild.scheduledEvents.create({
-          name: 'teste',
-          scheduledStartTime: '2024-01-01T12:00:00+01:00',
+          name: 'Scrim',
+          scheduledStartTime: startDate.toISOString(),
           privacyLevel:GuildScheduledEventPrivacyLevel.GuildOnly,
           entityType: GuildScheduledEventEntityType.Voice,
-          description: 'This is a test Scheduled Event',
+          description: 'Scrimtermin',
           channel: '1181997423715950674',
           image: null,
-          reason: 'Testing with creating a Scheduled Event'
+          reason: 'Ein neuer Scrimtermin wurde festgelegt'
         })
       } else if (reaction?.emoji.name === "👎" && reaction.count === 2) {
         const thread = await message.startThread({
